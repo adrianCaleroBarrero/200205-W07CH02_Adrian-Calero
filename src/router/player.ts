@@ -5,12 +5,10 @@ import {
     getControllerId,
     patchController,
     postController,
-} from '../controllers/player.controller';
-import { iPlayer } from '../interfaces/player';
+} from '../controllers/player.controller.js';
 
 export const playerRouter = Router();
 
-let players: Array<iPlayer> = [];
 playerRouter.get('/', getController);
 
 playerRouter.get('/:id', getControllerId);
