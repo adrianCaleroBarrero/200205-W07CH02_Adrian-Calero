@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import { iPlayer } from '../interfaces/player.js';
 
 const dataFilePath = './src/server/db.json';
-type dbPlayerType = {
+export type dbPlayerType = {
     players: Array<iPlayer>;
 };
 
