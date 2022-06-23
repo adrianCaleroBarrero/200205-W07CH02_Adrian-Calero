@@ -1,67 +1,68 @@
 /* eslint-disable no-unused-vars */
-import fs from 'fs/promises';
+import { ObjectId } from 'mongodb';
+import { mongoConnect } from '../db/mongo.js';
 import { iPlayer } from '../interfaces/player.js';
 
-export class PlayerModel {
-    data: Array<iPlayer>;
-    path: string;
-    constructor(private fileName: string) {
-        this.data = [];
-        this.path = `./src/server/${this.fileName}.json`;
-    }
-
-    private async readFile(): Promise<Array<iPlayer>> {
-        return JSON.parse(await fs.readFile(this.path, { encoding: 'utf-8' }));
-    }
-
-    private async writeFile(data: Array<iPlayer>) {
-        return fs.writeFile(this.path, JSON.stringify(data));
+export class PlayerModel implements iPlayer {
+    id: number;
+    constructor(
+        public name: string = '',
+        public team: string = '',
+        public points: number = 0,
+        public sickless: boolean = false
+    ) {
+        this.id = 0;
     }
 
     async findAll(): Promise<Array<iPlayer>> {
-        return this.readFile();
+        const { connect, collection } = await mongoConnect('NBA', 'Players');
+        const cursor = collection.find();
+        const result = (await cursor.toArray()) as unknown as Promise<
+            Array<iPlayer>
+        >;
+        connect.close();
+        return result;
     }
 
     async find(id: string): Promise<iPlayer | undefined> {
-        const fileData = await this.readFile();
-        const item = fileData.find((player: iPlayer) => player.id === +id);
-        return item;
+        const { connect, collection } = await mongoConnect('NBA', 'Players');
+        const dbId = new ObjectId(id);
+        const result = (await collection.findOne({
+            _id: dbId,
+        })) as unknown as iPlayer;
+        if (result === null) return undefined;
+        connect.close();
+        return result;
     }
 
     async create(data: Partial<iPlayer>): Promise<iPlayer> {
-        const fileData = await this.readFile();
-        const newPlayer = {
-            ...data,
-            id: fileData[fileData.length - 1].id + 1,
-        };
-        fileData.push(newPlayer as iPlayer);
-        this.writeFile(fileData);
-        return newPlayer as iPlayer;
+        const { connect, collection } = await mongoConnect('NBA', 'Players');
+        const result = (await collection.insertOne(data)) as unknown as iPlayer;
+        connect.close();
+        return result;
     }
 
     async update(id: string, data: Partial<iPlayer>): Promise<iPlayer> {
-        let fileData = await this.readFile();
-        if (data.id) delete data.id;
+        const { connect, collection } = await mongoConnect('NBA', 'Players');
 
-        let modifyPlayer;
-        fileData = fileData.map((player) => {
-            if (player.id === +id) {
-                modifyPlayer = { ...player, ...data };
-                return modifyPlayer;
-            } else {
-                return player;
-            }
-        });
-        this.writeFile(fileData);
-        return modifyPlayer as unknown as iPlayer;
+        const dbId = new ObjectId(id);
+        const result = (await collection.findOneAndUpdate(
+            { _id: dbId },
+            { $set: { ...data } }
+        )) as unknown as iPlayer;
+        connect.close();
+
+        return result;
     }
 
     async delete(id: string) {
-        let fileData = await this.readFile();
-        const prevLength = fileData.length;
-        fileData = fileData.filter((player) => player.id !== +id);
-        if (prevLength === fileData.length) return { status: 404 };
-        this.writeFile(fileData);
+        const { connect, collection } = await mongoConnect('NBA', 'Players');
+        const dbId = new ObjectId(id);
+        const result = await collection.findOneAndDelete({ _id: dbId });
+
+        connect.close();
+        if (!result.value) return { status: 404 };
+
         return { status: 202 };
     }
 }
