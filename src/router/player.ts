@@ -1,20 +1,16 @@
 import { Router } from 'express';
-import {
-    deleteController,
-    getController,
-    getControllerId,
-    patchController,
-    postController,
-} from '../controllers/player.controller.js';
+import { playerController } from '../controllers/player.controller.js';
+import { PlayerModel } from '../models/player.model.js';
 
+export const playersController = new playerController(new PlayerModel('db'));
 export const playerRouter = Router();
 
-playerRouter.get('/', getController);
+playerRouter.get('/', playersController.getAllController);
 
-playerRouter.get('/:id', getControllerId);
+playerRouter.get('/:id', playersController.getControllerId);
 
-playerRouter.post('/', postController);
+playerRouter.post('/', playersController.postController);
 
-playerRouter.patch('/:id', patchController);
+playerRouter.patch('/:id', playersController.patchController);
 
-playerRouter.delete('/:id', deleteController);
+playerRouter.delete('/:id', playersController.deleteController);

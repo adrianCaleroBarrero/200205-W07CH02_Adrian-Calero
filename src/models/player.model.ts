@@ -7,7 +7,7 @@ export class PlayerModel {
     path: string;
     constructor(private fileName: string) {
         this.data = [];
-        this.path = `./src/data/${this.fileName}.json`;
+        this.path = `./src/server/${this.fileName}.json`;
     }
 
     private async readFile(): Promise<Array<iPlayer>> {

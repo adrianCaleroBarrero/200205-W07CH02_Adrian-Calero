@@ -1,13 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Request, Response } from 'express';
-import fs from 'fs/promises';
-import { iPlayer } from '../interfaces/player.js';
 import { PlayerModel } from '../models/player.model.js';
-
-const dataFilePath = './src/server/db.json';
-export type dbPlayerType = {
-    players: Array<iPlayer>;
-};
 
 export class playerController {
     constructor(public model: PlayerModel) {}
