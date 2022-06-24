@@ -14,7 +14,7 @@ export class PlayerModel implements iPlayer {
         this.id = 0;
     }
 
-    async findAll(): Promise<Array<iPlayer>> {
+    async findAll() {
         const { connect, collection } = await mongoConnect('NBA', 'Players');
         const cursor = collection.find();
         const result = (await cursor.toArray()) as unknown as Promise<
@@ -24,7 +24,7 @@ export class PlayerModel implements iPlayer {
         return result;
     }
 
-    async find(id: string): Promise<iPlayer | undefined> {
+    async find(id: string) {
         const { connect, collection } = await mongoConnect('NBA', 'Players');
         const dbId = new ObjectId(id);
         const result = (await collection.findOne({
@@ -35,14 +35,14 @@ export class PlayerModel implements iPlayer {
         return result;
     }
 
-    async create(data: Partial<iPlayer>): Promise<iPlayer> {
+    async create(data: Partial<iPlayer>) {
         const { connect, collection } = await mongoConnect('NBA', 'Players');
         const result = (await collection.insertOne(data)) as unknown as iPlayer;
         connect.close();
         return result;
     }
 
-    async update(id: string, data: Partial<iPlayer>): Promise<iPlayer> {
+    async update(id: string, data: Partial<iPlayer>) {
         const { connect, collection } = await mongoConnect('NBA', 'Players');
 
         const dbId = new ObjectId(id);
