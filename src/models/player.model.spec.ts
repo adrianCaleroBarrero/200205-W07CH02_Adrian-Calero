@@ -6,7 +6,6 @@ jest.mock('../db/mongo.js');
 describe('Given a instantiated model Notes', () => {
     let model: PlayerModel;
 
-    let mockItem = { id: 1, test: 'test' };
     const mockFind = jest.fn();
     const mockFindOne = jest.fn();
     const mockInsertOne = jest.fn();
@@ -48,7 +47,6 @@ describe('Given a instantiated model Notes', () => {
             expect(mockFindOne).toHaveBeenCalled();
         });
     });
-
     describe('When method create is called', () => {
         test('Then collection.insertOne should be called', async () => {
             mockInsertOne.mockResolvedValue({});
@@ -65,7 +63,7 @@ describe('Given a instantiated model Notes', () => {
         });
     });
     describe('When method delete is called', () => {
-        test('Then collection.findOneAndDelete should be called', async () => {
+        test('Then collection.findOneAndDelete should be called and return status 202', async () => {
             mockFindOneAndDelete.mockResolvedValue({ value: {} });
             await model.delete('62b4ad0c52108a31996e764c');
             expect(mockFindOneAndDelete).toHaveBeenCalled();

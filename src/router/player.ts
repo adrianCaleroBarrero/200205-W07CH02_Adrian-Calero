@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { playerController } from '../controllers/player.controller.js';
 import { PlayerModel } from '../models/player.model.js';
 
-export const playersController = new playerController(new PlayerModel('db'));
+export const playersController = new playerController(new PlayerModel());
 export const playerRouter = Router();
 
 playerRouter.get('/', playersController.getAllController);
